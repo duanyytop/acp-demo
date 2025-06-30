@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"{src,apps,libs}/**/*.ts\" --fix",
     "create-acp-cells": "ts-node src/create-acp-cells.ts",
+    "transfer-usdi": "ts-node src/transfer-to-acp-lock.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,12 +15,18 @@
   "license": "ISC",
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
-    "@types/dotenv": "^8.2.3",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
     "dotenv": "^16.6.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "5.4.5"
   },
   "dependencies": {
+    "@ckb-lumos/codec": "^0.23.0",
     "@ckb-lumos/lumos": "^0.23.0"
   }
 }
