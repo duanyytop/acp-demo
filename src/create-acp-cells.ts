@@ -1,4 +1,4 @@
-import { Cell, commons, hd, helpers } from '@ckb-lumos/lumos';
+import { BI, Cell, commons, hd, helpers } from '@ckb-lumos/lumos';
 import {
   privateKey,
   ACP_DEFAULT_CAPACITY,
@@ -31,6 +31,7 @@ const createAcpCells = async (
     args,
   };
   const secp256k1Address = helpers.encodeToAddress(secp256k1Lock);
+  console.log(`Secp256k1 address: ${secp256k1Address}`);
   const { balance } = await getBalanceAndEmptyCells(secp256k1Address);
   console.log(`The Secp256k1 address's balance: ${balance.div(10 ** 8).toString()} CKB`);
 
@@ -39,23 +40,23 @@ const createAcpCells = async (
     args,
   };
 
-  const singleCapacity = BigInt(capacity * 10 ** 8);
+  const singleCapacity = BI.from(capacity * 10 ** 8);
   let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
-  const expectedCapacities = singleCapacity * BigInt(count);
+  const expectedCapacities = singleCapacity.mul(BI.from(count));
   // Collect empty input cells
-  let inputsCapacities = BigInt(0);
+  let inputsCapacities = BI.from(0);
   const inputCells: Cell[] = [];
   const collector = indexer.collector({ lock: secp256k1Lock, type: 'empty' });
   for await (const cell of collector.collect()) {
-    inputsCapacities = inputsCapacities + BigInt(cell.cellOutput.capacity);
+    inputsCapacities = inputsCapacities.add(BI.from(cell.cellOutput.capacity));
     inputCells.push(cell);
-    if (inputsCapacities > expectedCapacities) {
+    if (inputsCapacities.gt(expectedCapacities)) {
       break;
     }
   }
-  if (inputsCapacities < expectedCapacities) {
+  if (inputsCapacities.lt(expectedCapacities)) {
     throw new Error(
-      `Not enough capacity, expected: ${expectedCapacities / BigInt(10 ** 8)}, got: ${inputsCapacities / BigInt(10 ** 8)}`,
+      `Not enough capacity, expected: ${expectedCapacities.div(BI.from(10 ** 8))}, got: ${inputsCapacities.div(BI.from(10 ** 8))}`,
     );
   }
   txSkeleton = txSkeleton.update('inputs', (inputs) => inputs.concat(inputCells));
@@ -72,7 +73,7 @@ const createAcpCells = async (
   const changeOutput = {
     cellOutput: {
       lock: secp256k1Lock,
-      capacity: `0x${(inputsCapacities - expectedCapacities).toString(16)}`,
+      capacity: `0x${inputsCapacities.sub(expectedCapacities).toString(16)}`,
     },
     data: '0x',
   };

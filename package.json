@@ -2,12 +2,12 @@
   "name": "acp-demo",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "eslint \"{src,apps,libs}/**/*.ts\" --fix",
+    "lint": "eslint \"src/**/*.ts\" --fix",
     "create-acp-cells": "ts-node src/create-acp-cells.ts",
-    "transfer-usdi": "ts-node src/transfer-to-acp-lock.ts",
+    "transfer-usdi": "ts-node src/transfer-to-acp.ts",
+    "transfer-all": "ts-node src/transfer-all.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

@@ -38,7 +38,7 @@ const transferUSDIToAcpAddress = async (targetAddress: string, amount: number): 
   const { balance, emptyCells } = await getBalanceAndEmptyCells(secp256k1Address);
   const { balance: usdiBalance, cells: usdiCells } = await getUSDIBalanceAndCells(secp256k1Address);
   const expectedAmount = BI.from(amount * 10 ** 6); // USDI is in 6 decimal places
-  if (usdiBalance < expectedAmount) {
+  if (usdiBalance.lt(expectedAmount)) {
     throw new Error(
       `USDI Insufficient balance, expected: ${amount} USDI, got: ${usdiBalance.div(10 ** 6).toString()}`,
     );
@@ -67,11 +67,11 @@ const transferUSDIToAcpAddress = async (targetAddress: string, amount: number): 
     if (BI.from(cell.cellOutput.capacity).gt(helpers.minimalCellCapacityCompatible(cell))) {
       needEmptyCell = false;
     }
-    if (usdiSupply > expectedAmount) {
+    if (usdiSupply.gt(expectedAmount)) {
       break;
     }
   }
-  if (usdiSupply < expectedAmount) {
+  if (usdiSupply.lt(expectedAmount)) {
     throw new Error(
       `Not enough USDI, expected: ${amount}, got: ${usdiSupply.div(BI.from(10 ** 6))}`,
     );
@@ -134,11 +134,11 @@ const transferUSDIToAcpAddress = async (targetAddress: string, amount: number): 
   console.log(`tx hash is: ${txHash}`);
 };
 
-// Example usage: transfer 0.1 USDI to an ACP address
+// Example usage: transfer 1.1 USDI to an ACP address
 // Note: Make sure the target address is a valid ACP address and has enough capacity to hold
 transferUSDIToAcpAddress(
-  'ckt1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vq0e4xk4rmg5jdkn8aams492a7jlg73ue0ghutfuy',
-  0.1,
+  'ckt1qq6pngwqn6e9vlm92th84rk0l4jp2h8lurchjmnwv8kq3rt5psf4vq0mgqg9nng0tyzhw660mruc5k44akj42cq9melzd',
+  1.1,
 )
   .then(() => console.log('USDI transferred successfully.'))
   .catch((error) => console.error('Error transferring USDI:', error));
